@@ -484,7 +484,8 @@ public class APIQueryBuilder
                                 JSONObject currentSchool = jsArr.getJSONObject(i);
                                 String current = currentSchool.get("school_name");
 
-                                if(FuzzySearch.weightedRatio(current,schoolName)>85)
+                                if(FuzzySearch.tokenSetRatio(current.toLowerCase(),schoolName.toLowerCase())>90 &&
+                                FuzzySearch.partialRatio(current.toLowerCase(),schoolName.toLowerCase())>75 && FuzzySearch.tokenSortRatio(current.toLowerCase(),schoolName.toLowerCase())>83)
                                 {
                                     prog = currentSchool.get("moe_programme_desc");
                                     i=jsArr.length();
@@ -513,8 +514,9 @@ public class APIQueryBuilder
                                 JSONObject currentSchool = jsArr.getJSONObject(i);
                                 String current = currentSchool.get("school_name");
 
-                                if(FuzzySearch.weightedRatio(current,schoolName)>85)
-                                {
+                                if(FuzzySearch.tokenSetRatio(current.toLowerCase(),schoolName.toLowerCase())>90 &&
+                                FuzzySearch.partialRatio(current.toLowerCase(),schoolName.toLowerCase())>75 && FuzzySearch.tokenSortRatio(current.toLowerCase(),schoolName.toLowerCase())>83)
+                               {
                                     String ccaGroup = current.get("cca_grouping_desc");
                                     String ccaName = current.get("cca_generic_name");
 
