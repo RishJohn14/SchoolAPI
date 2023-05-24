@@ -217,7 +217,7 @@ public class APIAgentLauncher extends JPSAgent
         }
 
         Log.info(String.format("Retrieved CCA Readings"));
-        jsonMessage.acculuate("Result","Retrieved" + ccaReadings.getJSONObject("result").getJSONArray("records").length()+"CCA Readings");
+        jsonMessage.accumulate("Result","Retrieved" + ccaReadings.getJSONObject("result").getJSONArray("records").length()+"CCA Readings");
 
 
         //To call APIQueryBuilder
