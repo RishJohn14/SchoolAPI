@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import javax.lang.model.util.ElementScanner6;
-import javax.swing.plaf.InsetsUIResource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,7 +47,6 @@ import static org.eclipse.rdf4j.sparqlbuilder.rdf.Rdf.iri;
 import org.eclipse.rdf4j.sparqlbuilder.core.query.DeleteDataQuery;
 import org.eclipse.rdf4j.sparqlbuilder.core.query.InsertDataQuery;
 import org.eclipse.rdf4j.sparqlbuilder.core.query.Queries;
-
 public class APIQueryBuilder
 {
     
@@ -72,7 +70,7 @@ public class APIQueryBuilder
      */ 
 
     private static final Prefix PREFIX_ONTOSCHOOL = SparqlBuilder.prefix("ontoSchool", iri(OntoSchool));
-    public static final String generatedIRIPrefix = TimeSeriesSparql.ns_kb + "School";
+    public static final String generatedIRIPrefix = TimeSeriesSparql.TIMESERIES_NAMESPACE + "School";
     private static final Prefix PREFIX_RDFS = SparqlBuilder.prefix("rdfs", iri(RDFS_NS));
 
     
@@ -99,6 +97,7 @@ public class APIQueryBuilder
     */
 
     private static final Iri Name = PREFIX_ONTOSCHOOL.iri("Name");
+    private static final Iri School = PREFIX_ONTOSCHOOL.iri("School");
     private static final Iri Address = PREFIX_ONTOSCHOOL.iri("Address");
     private static final Iri EmailAddress = PREFIX_ONTOSCHOOL.iri("EmailAddress");
     private static final Iri PostalCode = PREFIX_ONTOSCHOOL.iri("PostalCode");
@@ -112,6 +111,8 @@ public class APIQueryBuilder
     private static final Iri Government = PREFIX_ONTOSCHOOL.iri("Government");
     private static final Iri GovernmentAided = PREFIX_ONTOSCHOOL.iri("Government-Aided");
     private static final Iri Specialised = PREFIX_ONTOSCHOOL.iri("Specialised");
+    private static final Iri Independent = PREFIX_ONTOSCHOOL.iri("Independent");
+    private static final Iri SpecialisedIndependent = PREFIX_ONTOSCHOOL.iri("SpecialisedIndependent");
     private static final Iri CCAGroup = PREFIX_ONTOSCHOOL.iri("CCAGroup");
     private static final Iri ClubsSocieties = PREFIX_ONTOSCHOOL.iri("Clubs&Societies");
     private static final Iri Others = PREFIX_ONTOSCHOOL.iri("Others");
@@ -275,7 +276,7 @@ public class APIQueryBuilder
                 final String schoolTypeIri = OntoSchool + "School_SchoolType" + UUID.randomUUID();
                 final String studentClassificationIri = OntoSchool + "School_StudentClassification" + UUID.randomUUID();
                 
-                if(schoolType.equalsIgnoreCase("GOVERNMENT SCHOOL"))
+                if(schoolType.equalsIgnoreCase("GOVERNMENT"))
                 {
                     TriplePattern updatePattern = iri(schoolTypeIri).isA(Government);
                     InsertDataQuery insert2 = Queries.INSERT_DATA(updatePattern);
@@ -283,9 +284,25 @@ public class APIQueryBuilder
 
                     kbClient.executeUpdate(insert2.getQueryString());
                 } 
-                else if(schoolType.equalsIgnoreCase("GOVERNMENT-AIDED SCHOOL"))
+                else if(schoolType.equalsIgnoreCase("GOVERNMENTAIDED"))
                 {
                     TriplePattern updatePattern = iri(schoolTypeIri).isA(GovernmentAided);
+                    InsertDataQuery insert2 = Queries.INSERT_DATA(updatePattern);
+                    insert2.prefix(PREFIX_ONTOSCHOOL);
+
+                    kbClient.executeUpdate(insert2.getQueryString());
+                }
+                else if(schoolType.equalsIgnoreCase("INDEPENDENT"))
+                {
+                    TriplePattern updatePattern = iri(schoolTypeIri).isA(Independent);
+                    InsertDataQuery insert2 = Queries.INSERT_DATA(updatePattern);
+                    insert2.prefix(PREFIX_ONTOSCHOOL);
+
+                    kbClient.executeUpdate(insert2.getQueryString());
+                }
+                else if(schoolType.equalsIgnoreCase("SPECIALISEDINDEPENDENT"))
+                {
+                    TriplePattern updatePattern = iri(schoolTypeIri).isA(SpecialisedIndependent);
                     InsertDataQuery insert2 = Queries.INSERT_DATA(updatePattern);
                     insert2.prefix(PREFIX_ONTOSCHOOL);
 
@@ -301,7 +318,7 @@ public class APIQueryBuilder
 
                 }
 
-                if(studentClassification.equalsIgnoreCase("BOYS' SCHOOL"))
+                if(studentClassification.equalsIgnoreCase("BOYS"))
                 {
                     TriplePattern updatePattern = iri(studentClassificationIri).isA(Boys);
                     InsertDataQuery insert2 = Queries.INSERT_DATA(updatePattern);
@@ -309,7 +326,7 @@ public class APIQueryBuilder
 
                     kbClient.executeUpdate(insert2.getQueryString());
                 } 
-                else if(studentClassification.equalsIgnoreCase("GIRLS' SCHOOL"))
+                else if(studentClassification.equalsIgnoreCase("GIRLS"))
                 {
                     TriplePattern updatePattern = iri(studentClassificationIri).isA(Girls);
                     InsertDataQuery insert2 = Queries.INSERT_DATA(updatePattern);
@@ -327,9 +344,9 @@ public class APIQueryBuilder
 
                 }
 
+                String result=null;
                 try
                 {
-                    String result=null;
                     Variable schoolIRI = SparqlBuilder.var("schoolIRI");
                     SelectQuery query = Queries.SELECT();
                     TriplePattern queryPattern = schoolIRI.has(hasName,schoolName);
@@ -358,15 +375,15 @@ public class APIQueryBuilder
                     insert.prefix(PREFIX_ONTOSCHOOL);
                     kbClient.executeUpdate(insert.getQueryString());
 
-                    InsertDataQuery insert = Queries.INSERT_DATA(pattern2);
-                    insert.prefix(PREFIX_ONTOSCHOOL);
-                    kbClient.executeUpdate(insert.getQueryString());
+                    InsertDataQuery Insert = Queries.INSERT_DATA(pattern2);
+                    Insert.prefix(PREFIX_ONTOSCHOOL);
+                    kbClient.executeUpdate(Insert.getQueryString());
 
 
                     TriplePattern pattern = iri(result).isA(School);
-                    InsertDataQuery insert = Queries.INSERT_DATA(pattern);
-                    insert.prefix(PREFIX_ONTOSCHOOL);
-                    kbClient.executeUpdate(insert.getQueryString());
+                    InsertDataQuery insert12 = Queries.INSERT_DATA(pattern);
+                    insert12.prefix(PREFIX_ONTOSCHOOL);
+                    kbClient.executeUpdate(insert12.getQueryString());
 
 
 
@@ -379,10 +396,10 @@ public class APIQueryBuilder
     
                     //TriplePattern to linke studentClassificationType IRI to Data IRI
     
-                    TriplePattern updatePattern = iri(studentClassificationIri).has(hasStudentClassification,iri);
-                    InsertDataQuery insertUpdate = Queries.INSERT_DATA(updatePattern);
-                    insertUpdate.prefix(PREFIX_ONTOSCHOOL);
-                    kbClient.executeUpdate(insertUpdate.getQueryString());    
+                    TriplePattern updatePattern1 = iri(studentClassificationIri).has(hasStudentClassification,iri);
+                    InsertDataQuery insertUpdate1 = Queries.INSERT_DATA(updatePattern1);
+                    insertUpdate1.prefix(PREFIX_ONTOSCHOOL);
+                    kbClient.executeUpdate(insertUpdate1.getQueryString());    
 
                 }
                 catch(Exception e)
@@ -390,10 +407,11 @@ public class APIQueryBuilder
                     throw new JPSRuntimeException("Unable to execute query: " + q.getQueryString());
                 }
     
-                
+            
+
                 String result1=null;
                 Variable schoolAddressIRI = SparqlBuilder.var("schoolAddressIRI");
-                SelectQuert query1 = Queries.SELECT();
+                SelectQuery query1 = Queries.SELECT();
 
                 TriplePattern queryPattern1 = iri(result).has(hasAddress,schoolAddressIRI);
                 query1.prefix(PREFIX_ONTOSCHOOL).select(schoolAddressIRI).where(queryPattern1);
@@ -482,12 +500,12 @@ public class APIQueryBuilder
                             for(int i=0; i<jsArr.length();i++)
                             {
                                 JSONObject currentSchool = jsArr.getJSONObject(i);
-                                String current = currentSchool.get("school_name");
+                                String current = currentSchool.getString("school_name");
 
                                 if(FuzzySearch.tokenSetRatio(current.toLowerCase(),schoolName.toLowerCase())>90 &&
                                 FuzzySearch.partialRatio(current.toLowerCase(),schoolName.toLowerCase())>75 && FuzzySearch.tokenSortRatio(current.toLowerCase(),schoolName.toLowerCase())>83)
                                 {
-                                    prog = currentSchool.get("moe_programme_desc");
+                                    prog = currentSchool.getString("moe_programme_desc");
                                     i=jsArr.length();
                                 }
 
@@ -512,13 +530,13 @@ public class APIQueryBuilder
                             for(int i=0; i<jsArr.length();i++)
                             {
                                 JSONObject currentSchool = jsArr.getJSONObject(i);
-                                String current = currentSchool.get("school_name");
+                                String current = currentSchool.getString("school_name");
 
                                 if(FuzzySearch.tokenSetRatio(current.toLowerCase(),schoolName.toLowerCase())>90 &&
                                 FuzzySearch.partialRatio(current.toLowerCase(),schoolName.toLowerCase())>75 && FuzzySearch.tokenSortRatio(current.toLowerCase(),schoolName.toLowerCase())>83)
                                {
-                                    String ccaGroup = current.get("cca_grouping_desc");
-                                    String ccaName = current.get("cca_generic_name");
+                                    String ccaGroup = currentSchool.getString("cca_grouping_desc");
+                                    String ccaName = currentSchool.getString("cca_generic_name");
 
                                     TriplePattern pattern9 = iri(result).has(hasCCAGroup,ccaGroup);
                                     InsertDataQuery insert9 = Queries.INSERT_DATA(pattern9);
